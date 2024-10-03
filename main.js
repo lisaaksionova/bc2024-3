@@ -23,7 +23,15 @@ if(options.output){
     'encoding':'utf-8',
     'flag':'r'
   });
-  const obj = JSON.parse(jsonData);
+  let obj;
+  jsonData.forEach(e=>{
+    if(e.txt == "Доходи, усього" 
+      || e.txt == "Витрати, усього"
+    )
+    obj += e.txt + ' : ' + e.value + '\n';
+  })
+  
+
    fs.writeFileSync(options.output, 
     JSON.stringify(obj, null, 4),
     {
@@ -35,11 +43,18 @@ if(options.output){
 }
 
 if(options.display){
-  const jsonData = fs.readFileSync(options.input, {
+  let jsonData = fs.readFileSync(options.input, {
     'encoding':'utf-8',
     'flag':'r'
   });
-  const obj = JSON.parse(jsonData);
+  let obj;
+  jsonData = JSON.parse(jsonData);
+  jsonData.forEach(e=>{
+    if(e.txt == "Доходи, усього" 
+      || e.txt == "Витрати, усього"
+    )
+    obj += e.txt + ' : ' + e.value + '\n';
+  })
   console.log(obj);
 }
   console.log(`Input path is: ${options.input}`);
