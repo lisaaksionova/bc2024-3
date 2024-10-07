@@ -1,61 +1,49 @@
 const { program } = require('commander');
 const  fs  = require('fs');
+
+let readFromFile = function(path) {
+    let jsonData = fs.readFileSync(path, { encoding: 'utf-8', flag: 'r' });
+    
+    
+    let data = JSON.parse(jsonData);
+    
+    let str = '';
+    
+    
+    data.forEach(obj => {
+      if (obj.txt === "Доходи, усього" || obj.txt === "Витрати, усього") {
+        str += obj.txt + ' : ' + obj.value + '\n';
+      }
+    });
+    
+    return str;
+}
+
+
 program
   .option('-i, --input <path> ')
   .option('-o, --output <path>')
   .option('-d, --display');
 
-  program.parse(process.argv);
+program.parse(process.argv);
 
-  const options = program.opts();
+const options = program.opts();
   
-  if (!options.input) {
+if (!options.input) {
     console.error('Please, specify input file');
-    process.exit(1); // Вихід з кодом помилки
   }
- // Перевірка наявності файлу
 if (!fs.existsSync(options.input)) {
   console.error('Cannot find input file');
-  process.exit(1); // Вихід з кодом помилки
+  process.exit(1); 
 }
-if(options.output){
-  const jsonData = fs.readFileSync(options.input, {
-    'encoding':'utf-8',
-    'flag':'r'
-  });
-  let obj;
-  jsonData.forEach(e=>{
-    if(e.txt == "Доходи, усього" 
-      || e.txt == "Витрати, усього"
-    )
-    obj += e.txt + ' : ' + e.value + '\n';
-  })
+
+if (options.output) {
+  const data = readFromFile(options.input); 
+  fs.writeFileSync(options.output, data, { encoding: 'utf-8' });
+}
   
 
-   fs.writeFileSync(options.output, 
-    JSON.stringify(obj, null, 4),
-    {
-      'encoding' : 'utf-8',
-      'flag':'w',
-      'flush':true
-    }
-  );
-}
-
 if(options.display){
-  let jsonData = fs.readFileSync(options.input, {
-    'encoding':'utf-8',
-    'flag':'r'
-  });
-  let obj;
-  jsonData = JSON.parse(jsonData);
-  jsonData.forEach(e=>{
-    if(e.txt == "Доходи, усього" 
-      || e.txt == "Витрати, усього"
-    )
-    obj += e.txt + ' : ' + e.value + '\n';
-  })
-  console.log(obj);
+  console.log(readFromFile(options.input));
 }
-  console.log(`Input path is: ${options.input}`);
 
